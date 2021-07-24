@@ -1,17 +1,6 @@
 main: com.potionenchants.plugin.Main
-name: PotionEnchantsPlugin
-version: 1.0
-author: Your Mom ¯\_(ツ)_/¯ (Dguto9)
-description: Adds potion-based "enchants" to your weapons and armour. For example, poison-dipped sword applies poison to the one being hit.
+name: PotionDippedItems
+version: 1.1
+author: Dguto9 
+description: Allows players to add potion effects to their weapons and armor. For example, poison-dipped sword applies poison to the one being hit, while strength-dipped armor applies strength to the one wearing it whenever they are hit.
 api-version: 1.16
-commands:
-    potenchantlist:
-       description: Lists all of the "enchants" that this plugin adds.
-       usage: /potenchantlist
-       permission: potionenchants.list
-       permission-message: You don't have the potionenchants.list permission.
-    potenchantdebug:
-       description: Toggle the debug messages on and off.
-       usage: /potenchantdebug
-       permission: potionenchants.debug
-       permission-message: You don't have the potionenchants.debug permission.

@@ -1,6 +1,7 @@
 package com.potionenchants.plugin;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -32,7 +33,7 @@ public class EventListener implements Listener {
     private String loreString;
     private ItemStack air = new ItemStack(Material.AIR);
     
-    boolean debugMode = Main.debug;
+    boolean debugMode = false;
 
 	@EventHandler
 	public void EntityDamageByEntity(EntityDamageByEntityEvent event) {
@@ -52,23 +53,25 @@ public class EventListener implements Listener {
 		
 		if (event.getDamager() instanceof Player) {
 			Player damager = (Player) event.getDamager();
-			ItemStack weapon = damager.getInventory().getItemInMainHand();
-			NamespacedKey key = new NamespacedKey(Main.getInstance(), "potioneffect");
-			ItemMeta weaponMeta = weapon.getItemMeta();
-			CustomItemTagContainer tagContainer = weaponMeta.getCustomTagContainer();
-			if(!tagContainer.hasCustomTag(key, ItemTagType.STRING)) {
-				if (debugMode) {
-					event.getEntity().sendMessage("Item did not have tag!");
-					event.getDamager().sendMessage("Item did not have tag!");
+			if (damager.hasPermission("PotionDipped.Weapon.PotionType.Use")) {
+				ItemStack weapon = damager.getInventory().getItemInMainHand();
+				NamespacedKey key = new NamespacedKey(Main.getInstance(), "potioneffect");
+				ItemMeta weaponMeta = weapon.getItemMeta();
+				CustomItemTagContainer tagContainer = weaponMeta.getCustomTagContainer();
+				if(!tagContainer.hasCustomTag(key, ItemTagType.STRING)) {
+					if (debugMode) {
+						event.getEntity().sendMessage("Item did not have tag!");
+						event.getDamager().sendMessage("Item did not have tag!");
+					}
+					return;
 				}
-				return;
-			}
-			else {
-				LivingEntity target = (LivingEntity) event.getEntity();
-				target.addPotionEffect(PotionEffectType.getByName(tagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
-				if (debugMode) {
-					event.getEntity().sendMessage("Added effect!");
-					event.getDamager().sendMessage("Added effect!");
+				else {
+					LivingEntity target = (LivingEntity) event.getEntity();
+					target.addPotionEffect(PotionEffectType.getByName(tagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
+					if (debugMode) {
+						event.getEntity().sendMessage("Added effect!");
+						event.getDamager().sendMessage("Added effect!");
+					}		
 				}
 			}
 		}
@@ -79,40 +82,42 @@ public class EventListener implements Listener {
 		}
 		if (event.getEntity() instanceof Player) {
 			Player entity = (Player) event.getEntity();
-			ItemStack chestplate = entity.getInventory().getChestplate();
-			ItemStack leggings = entity.getInventory().getLeggings();
-			NamespacedKey key = new NamespacedKey(Main.getInstance(), "potioneffect");
-			ItemMeta chestplateMeta = chestplate.getItemMeta();
-			ItemMeta leggingsMeta = leggings.getItemMeta();
-			CustomItemTagContainer chestTagContainer = chestplateMeta.getCustomTagContainer();
-			CustomItemTagContainer legsTagContainer = leggingsMeta.getCustomTagContainer();
-			if(chestTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
-				entity.addPotionEffect(PotionEffectType.getByName(chestTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
-				if (debugMode) {
-					event.getEntity().sendMessage("Added chest effect!");
-					event.getDamager().sendMessage("Added chest effect!");
+			if (entity.hasPermission("PotionDipped.Armor.PotionType.Use")) {
+				ItemStack chestplate = entity.getInventory().getChestplate();
+				ItemStack leggings = entity.getInventory().getLeggings();
+				NamespacedKey key = new NamespacedKey(Main.getInstance(), "potioneffect");
+				ItemMeta chestplateMeta = chestplate.getItemMeta();
+				ItemMeta leggingsMeta = leggings.getItemMeta();
+				CustomItemTagContainer chestTagContainer = chestplateMeta.getCustomTagContainer();
+				CustomItemTagContainer legsTagContainer = leggingsMeta.getCustomTagContainer();
+				if(chestTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
+					entity.addPotionEffect(PotionEffectType.getByName(chestTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
+					if (debugMode) {
+						event.getEntity().sendMessage("Added chest effect!");
+						event.getDamager().sendMessage("Added chest effect!");
+					}
 				}
-			}
-			else {
-				if (debugMode) {
-					event.getEntity().sendMessage("Chestplate did not have tag!");
-					event.getDamager().sendMessage("Chestplate did not have tag!");
+				else {
+					if (debugMode) {
+						event.getEntity().sendMessage("Chestplate did not have tag!");
+						event.getDamager().sendMessage("Chestplate did not have tag!");
+					}
+					return;
 				}
-				return;
-			}
-			if(legsTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
-				entity.addPotionEffect(PotionEffectType.getByName(legsTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
-				if (debugMode) {
-					event.getEntity().sendMessage("Added effect!");
-					event.getDamager().sendMessage("Added effect!");
+				if(legsTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
+					entity.addPotionEffect(PotionEffectType.getByName(legsTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
+					if (debugMode) {
+						event.getEntity().sendMessage("Added effect!");
+						event.getDamager().sendMessage("Added effect!");
+					}
 				}
-			}
-			else {
-				if (debugMode) {
-					event.getEntity().sendMessage("Leggings did not have tag!");
-					event.getDamager().sendMessage("Leggings did not have tag!");
+				else {
+					if (debugMode) {
+						event.getEntity().sendMessage("Leggings did not have tag!");
+						event.getDamager().sendMessage("Leggings did not have tag!");
+					}
+					return;
 				}
-				return;
 			}
 		}
 		else {
@@ -125,6 +130,7 @@ public class EventListener implements Listener {
 	@EventHandler
 	public void anvilLis(PrepareAnvilEvent e) {
 		ItemStack[] slotAnvil = e.getInventory().getContents();
+		List<HumanEntity> viewers = e.getInventory().getViewers();
 		if(slotAnvil[0] == null || slotAnvil[1] == null) {
 			recipeCorrect = false;
 			return;
@@ -138,8 +144,7 @@ public class EventListener implements Listener {
         	return;
         }
         if (slotAnvil[0].getType() == Material.LINGERING_POTION) {
-        	potion = new ItemStack(slotAnvil[0]);
-        	
+        	potion = new ItemStack(slotAnvil[0]);	
         }
         else if (slotAnvil[1].getType() == Material.LINGERING_POTION){
         	potion = new ItemStack(slotAnvil[1]);
@@ -149,6 +154,18 @@ public class EventListener implements Listener {
         } 
         else if (slotAnvil[1].getType() == Material.DIAMOND_SWORD || slotAnvil[1].getType() == Material.NETHERITE_SWORD || slotAnvil[1].getType() == Material.DIAMOND_CHESTPLATE || slotAnvil[1].getType() == Material.NETHERITE_CHESTPLATE || slotAnvil[1].getType() == Material.DIAMOND_LEGGINGS || slotAnvil[1].getType() == Material.NETHERITE_LEGGINGS) {
         	object = new ItemStack(slotAnvil[1]);
+        }
+        if (object.getType() == Material.DIAMOND_SWORD || object.getType() == Material.NETHERITE_SWORD) {
+        	if (!viewers.get(0).hasPermission("PotionDipped.Weapon.PotionType.Craft")) {
+        		viewers.get(0).sendMessage("You do not have permission to create potion dipped weapons!");
+        		return;
+        	}
+        }
+        if (object.getType() == Material.DIAMOND_CHESTPLATE || object.getType() == Material.NETHERITE_CHESTPLATE || object.getType() == Material.DIAMOND_LEGGINGS || object.getType() == Material.NETHERITE_LEGGINGS) {
+        	if (!viewers.get(0).hasPermission("PotionDipped.Armor.PotionType.Craft")) {
+        		viewers.get(0).sendMessage("You do not have permission to create potion dipped armor!");
+        		return;
+        	}
         }
        /* if (slotAnvil[0].getType() == Material.NETHERITE_INGOT)
         	ingot = new ItemStack(slotAnvil[0]);
