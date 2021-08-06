@@ -83,40 +83,42 @@ public class EventListener implements Listener {
 		if (event.getEntity() instanceof Player) {
 			Player entity = (Player) event.getEntity();
 			if (entity.hasPermission("PotionDipped.Armor.PotionType.Use")) {
-				ItemStack chestplate = entity.getInventory().getChestplate();
-				ItemStack leggings = entity.getInventory().getLeggings();
 				NamespacedKey key = new NamespacedKey(Main.getInstance(), "potioneffect");
-				ItemMeta chestplateMeta = chestplate.getItemMeta();
-				ItemMeta leggingsMeta = leggings.getItemMeta();
-				CustomItemTagContainer chestTagContainer = chestplateMeta.getCustomTagContainer();
-				CustomItemTagContainer legsTagContainer = leggingsMeta.getCustomTagContainer();
-				if(chestTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
-					entity.addPotionEffect(PotionEffectType.getByName(chestTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
-					if (debugMode) {
-						event.getEntity().sendMessage("Added chest effect!");
-						event.getDamager().sendMessage("Added chest effect!");
+				ItemStack chestplate = entity.getInventory().getChestplate();
+				if (chestplate != null) {
+					ItemMeta chestplateMeta = chestplate.getItemMeta();
+					CustomItemTagContainer chestTagContainer = chestplateMeta.getCustomTagContainer();
+					if(chestTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
+						entity.addPotionEffect(PotionEffectType.getByName(chestTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
+						if (debugMode) {
+							event.getEntity().sendMessage("Added chest effect!");
+							event.getDamager().sendMessage("Added chest effect!");
+						}
+					}
+					else {
+						if (debugMode) {
+							event.getEntity().sendMessage("Chestplate did not have tag!");
+							event.getDamager().sendMessage("Chestplate did not have tag!");
+						}
 					}
 				}
-				else {
-					if (debugMode) {
-						event.getEntity().sendMessage("Chestplate did not have tag!");
-						event.getDamager().sendMessage("Chestplate did not have tag!");
+				ItemStack leggings = entity.getInventory().getLeggings();
+				if (leggings != null) {
+					ItemMeta leggingsMeta = leggings.getItemMeta();
+					CustomItemTagContainer legsTagContainer = leggingsMeta.getCustomTagContainer();
+					if(legsTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
+						entity.addPotionEffect(PotionEffectType.getByName(legsTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
+						if (debugMode) {
+							event.getEntity().sendMessage("Added effect!");
+							event.getDamager().sendMessage("Added effect!");
+						}
 					}
-					return;
-				}
-				if(legsTagContainer.hasCustomTag(key, ItemTagType.STRING)) {
-					entity.addPotionEffect(PotionEffectType.getByName(legsTagContainer.getCustomTag(key, ItemTagType.STRING)).createEffect(60, 1));
-					if (debugMode) {
-						event.getEntity().sendMessage("Added effect!");
-						event.getDamager().sendMessage("Added effect!");
+					else {
+						if (debugMode) {
+							event.getEntity().sendMessage("Leggings did not have tag!");
+							event.getDamager().sendMessage("Leggings did not have tag!");
+						}
 					}
-				}
-				else {
-					if (debugMode) {
-						event.getEntity().sendMessage("Leggings did not have tag!");
-						event.getDamager().sendMessage("Leggings did not have tag!");
-					}
-					return;
 				}
 			}
 		}
